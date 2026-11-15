@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#17263d" />
+  <title>Linkify Payment Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <section class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-brand-mark">L</div>
+      <div class="eyebrow">LINKIFY WORKSPACE</div>
+      <h1>Payment Manager</h1>
+      <p>Sign in with your confirmed Supabase account to manage invoices and payments.</p>
+      <form id="loginForm">
+        <label for="loginEmail">Email address</label>
+        <input id="loginEmail" type="email" autocomplete="username" required placeholder="you@example.com">
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Your password">
+        <button class="primary-btn login-submit" id="loginButton" type="submit">Sign in</button>
+        <div class="auth-message" id="authMessage" role="status"></div>
+      </form>
+      <div class="login-security">Secure sign-in powered by Supabase Authentication</div>
+    </div>
+  </section>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">L</div>
+        <div><div class="brand-name">LINKIFY</div><div class="brand-subtitle">PAYMENT MANAGER</div></div>
+      </div>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="nav-menu" aria-label="Main navigation">
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span>Dashboard</button>
+        <button class="nav-item" data-page="vendors"><span class="nav-icon">▣</span>Vendors</button>
+        <button class="nav-item" data-page="clients"><span class="nav-icon">♙</span>Clients</button>
+        <button class="nav-item" data-page="invoices"><span class="nav-icon">▤</span>Invoices</button>
+        <button class="nav-item" data-page="transactions"><span class="nav-icon">⇄</span>Transactions</button>
+        <button class="nav-item" data-page="reports"><span class="nav-icon">▥</span>Reports</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note"><div class="note-icon">✦</div><div><strong>Stay organized</strong><span>Keep every payment in one place.</span></div></div>
+        <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Settings</button>
+        <div class="user-profile"><div class="avatar">AS</div><div><strong>Akbar Shakir</strong><span>Linkify Admin</span></div><span class="profile-dots">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
+        <div class="breadcrumb"><span>Workspace</span><b>/</b><strong id="breadcrumbCurrent">Dashboard</strong></div>
+        <div class="topbar-actions">
+          <div class="today-pill"><span class="live-dot"></span><span id="todayLabel"></span></div>
+          <button class="icon-button" id="quickAddBtn" title="Quick add">＋</button>
+          <span class="signed-in-email" id="signedInEmail"></span><button class="secondary-btn signout-btn" id="signOutBtn" type="button">Sign out</button><div class="avatar small">AS</div>
+        </div>
+      </header>
+      <div class="page-content">
+        <section class="page-view active" id="page-dashboard">
+          <div class="page-heading">
+            <div><div class="eyebrow">OVERVIEW</div><h1>Good to see you, Akbar <span class="wave">✦</span></h1><p>Here is what is happening with your payments today.</p></div>
+            <button class="primary-btn" id="dashboardAddBtn">＋ Add transaction</button>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card"><div class="stat-top"><span>Total received</span><span class="stat-icon green">↙</span></div><div class="stat-value" id="statReceived">$0.00</div><div class="stat-foot"><span class="trend neutral">USD and PKR</span><span>From clients</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>Total sent</span><span class="stat-icon blue">↗</span></div><div class="stat-value" id="statSent">$0.00</div><div class="stat-foot"><span class="trend neutral">USD and PKR</span><span>To vendors</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>Receivable</span><span class="stat-icon amber">◷</span></div><div class="stat-value" id="statReceivable">$0.00</div><div class="stat-foot"><span class="trend warning">Outstanding</span><span>From clients</span></div></article>
+            <article class="stat-card"><div class="stat-top"><span>Payable</span><span class="stat-icon purple">⌁</span></div><div class="stat-value" id="statPayable">$0.00</div><div class="stat-foot"><span class="trend warning">Outstanding</span><span>To vendors</span></div></article>
+          </div>
+          <div class="dashboard-grid">
+            <section class="panel chart-panel"><div class="panel-heading"><div><h2>Cash flow overview</h2><p>View one currency at a time</p></div><div class="chart-controls"><select id="chartCurrency" class="small-select"><option value="USD">USD ($)</option><option value="PKR">PKR (₨)</option></select><select id="chartRange" class="small-select"><option value="6">Last 6 months</option><option value="3">Last 3 months</option></select></div></div><div class="chart-legend"><span><i class="legend-dot received"></i>Received</span><span><i class="legend-dot sent"></i>Sent</span></div><div class="chart" id="cashflowChart"><div class="empty-state compact">Add transactions to see your cash flow.</div></div></section>
+            <section class="panel"><div class="panel-heading"><div><h2>Outstanding invoices</h2><p>Payments that need attention</p></div><button class="text-btn" data-go="invoices">View all →</button></div><div id="outstandingList" class="compact-list"><div class="empty-state compact">No outstanding invoices yet.</div></div></section>
+          </div>
+          <section class="panel currency-summary-panel">
+            <div class="panel-heading"><div><h2>This month's financial summary</h2><p>USD and PKR are calculated independently, with no currency conversion.</p></div></div>
+            <div class="currency-summary-grid">
+              <article class="currency-summary-card"><div class="currency-summary-heading"><strong>US Dollar</strong><span>USD ($)</span></div><div class="currency-metrics"><div><span>Received</span><strong id="monthUsdReceived">$0.00</strong></div><div><span>Sent</span><strong id="monthUsdSent">$0.00</strong></div><div><span>Net cash flow</span><strong id="monthUsdNet">$0.00</strong></div><div><span>Receivable</span><strong id="outUsdReceivable">$0.00</strong></div><div><span>Payable</span><strong id="outUsdPayable">$0.00</strong></div></div></article>
+              <article class="currency-summary-card"><div class="currency-summary-heading"><strong>Pakistani Rupee</strong><span>PKR (₨)</span></div><div class="currency-metrics"><div><span>Received</span><strong id="monthPkrReceived">₨0.00</strong></div><div><span>Sent</span><strong id="monthPkrSent">₨0.00</strong></div><div><span>Net cash flow</span><strong id="monthPkrNet">₨0.00</strong></div><div><span>Receivable</span><strong id="outPkrReceivable">₨0.00</strong></div><div><span>Payable</span><strong id="outPkrPayable">₨0.00</strong></div></div></article>
+            </div>
+          </section>
+          <section class="panel recent-panel"><div class="panel-heading"><div><h2>Recent transactions</h2><p>Your latest money movement</p></div><button class="text-btn" data-go="transactions">View all →</button></div><div class="table-wrap"><table><thead><tr><th>CONTACT</th><th>TYPE</th><th>DATE</th><th>METHOD</th><th>AMOUNT</th><th>STATUS</th></tr></thead><tbody id="recentTransactions"></tbody></table></div></section>
+        </section>
+
+        <section class="page-view" id="page-vendors">
+          <div class="page-heading"><div><div class="eyebrow">PAYABLES</div><h1>Vendors</h1><p>Manage the people and businesses you pay.</p></div><button class="primary-btn" id="addVendorBtn">＋ Add vendor</button></div>
+          <div class="toolbar"><div class="search-box"><span>⌕</span><input id="vendorSearch" placeholder="Search vendors..." /></div><span class="result-count" id="vendorCount">0 vendors</span></div>
+          <div class="entity-grid" id="vendorGrid"></div>
+        </section>
+
+        <section class="page-view" id="page-clients">
+          <div class="page-heading"><div><div class="eyebrow">RECEIVABLES</div><h1>Clients</h1><p>Keep track of clients and incoming payments.</p></div><button class="primary-btn" id="addClientBtn">＋ Add client</button></div>
+          <div class="toolbar"><div class="search-box"><span>⌕</span><input id="clientSearch" placeholder="Search clients..." /></div><span class="result-count" id="clientCount">0 clients</span></div>
+          <div class="entity-grid" id="clientGrid"></div>
+        </section>
+
+        <section class="page-view" id="page-invoices">
+          <div class="page-heading"><div><div class="eyebrow">BILLING RECORDS</div><h1>Invoices</h1><p>Track vendor invoices and client billing in one place.</p></div><button class="primary-btn" id="addInvoiceBtn">＋ Add invoice</button></div>
+          <div class="toolbar"><div class="search-box"><span>⌕</span><input id="invoiceSearch" placeholder="Search invoices or contacts..." /></div><select id="invoiceFilter" class="filter-select"><option value="all">All invoices</option><option value="receivable">Client invoices</option><option value="payable">Vendor invoices</option><option value="unpaid">Unpaid</option><option value="partial">Partially paid</option><option value="paid">Paid</option><option value="overdue">Overdue</option></select></div>
+          <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>INVOICE</th><th>CONTACT</th><th>TYPE</th><th>ISSUED</th><th>DUE DATE</th><th>AMOUNT</th><th>REMAINING</th><th>STATUS</th><th></th></tr></thead><tbody id="invoiceRows"></tbody></table></div></div>
+        </section>
+
+        <section class="page-view" id="page-transactions">
+          <div class="page-heading"><div><div class="eyebrow">MONEY MOVEMENT</div><h1>Transactions</h1><p>Every payment sent and received, recorded clearly.</p></div><button class="primary-btn" id="addTransactionBtn">＋ Add transaction</button></div>
+          <div class="toolbar"><div class="search-box"><span>⌕</span><input id="transactionSearch" placeholder="Search transactions..." /></div><select id="transactionFilter" class="filter-select"><option value="all">All transactions</option><option value="received">Money received</option><option value="sent">Money sent</option></select></div>
+          <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>CONTACT</th><th>TYPE</th><th>DATE</th><th>METHOD</th><th>REFERENCE</th><th>AMOUNT</th><th>RECEIPT</th><th></th></tr></thead><tbody id="transactionRows"></tbody></table></div></div>
+        </section>
+
+        <section class="page-view" id="page-reports">
+          <div class="page-heading"><div><div class="eyebrow">BUSINESS INSIGHTS</div><h1>Reports</h1><p>A clear picture of your Linkify payment activity.</p></div><button class="secondary-btn" id="exportCsvBtn">↓ Export CSV</button></div>
+          <div class="stats-grid report-stats"><article class="stat-card"><div class="stat-top"><span>Total vendors</span><span class="stat-icon blue">▣</span></div><div class="stat-value" id="reportVendors">0</div><div class="stat-foot">Saved vendor profiles</div></article><article class="stat-card"><div class="stat-top"><span>Total clients</span><span class="stat-icon green">♙</span></div><div class="stat-value" id="reportClients">0</div><div class="stat-foot">Saved client profiles</div></article><article class="stat-card"><div class="stat-top"><span>Invoices</span><span class="stat-icon amber">▤</span></div><div class="stat-value" id="reportInvoices">0</div><div class="stat-foot">All invoice records</div></article><article class="stat-card"><div class="stat-top"><span>Transactions</span><span class="stat-icon purple">⇄</span></div><div class="stat-value" id="reportTransactions">0</div><div class="stat-foot">All payment records</div></article></div>
+          <div class="panel"><div class="panel-heading"><div><h2>Payment methods</h2><p>Transaction count by payment method</p></div></div><div id="methodReport" class="method-report"></div></div>
+          <div class="panel report-note"><strong>Currency reporting</strong><p>USD and PKR are stored separately. This demo does not combine currencies using a live exchange rate. The connected version will save the exchange rate used on each transaction.</p></div>
+        </section>
+
+        <section class="page-view" id="page-settings">
+          <div class="page-heading"><div><div class="eyebrow">PREFERENCES</div><h1>Settings</h1><p>Manage your workspace preferences and local demo data.</p></div></div>
+          <div class="settings-grid">
+            <div class="panel"><h2>Workspace</h2><p class="settings-description">Your payment workspace details.</p><label class="field-label">Business name<input value="Linkify Guest Posting Agency" disabled></label><label class="field-label">Owner<input value="Akbar Shakir" disabled></label><label class="field-label">Default currency<select id="defaultCurrency"><option>USD</option><option>PKR</option></select></label></div>
+            <div class="panel"><h2>Data & backup</h2><p class="settings-description">Your records are saved securely in your Supabase cloud database.</p><button class="secondary-btn full-btn" id="downloadBackupBtn">↓ Download JSON backup</button><button class="danger-outline full-btn" id="clearDataBtn">Sign out</button><div class="notice-box">Cloud database, authentication and private receipt storage are connected. Your data is available when you sign in on another device.</div></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header"><div><div class="eyebrow" id="modalEyebrow">NEW RECORD</div><h2 id="modalTitle">Add record</h2></div><button class="close-btn" id="closeModal" aria-label="Close">×</button></div>
+      <form id="recordForm"><div class="modal-body" id="modalBody"></div><div class="modal-footer"><button type="button" class="secondary-btn" id="cancelModal">Cancel</button><button type="submit" class="primary-btn">Save record</button></div></form>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
