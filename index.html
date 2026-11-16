@@ -97,6 +97,12 @@
           <div class="page-heading"><div><div class="eyebrow">RECEIVABLES</div><h1>Clients</h1><p>Keep track of clients and incoming payments.</p></div><button class="primary-btn" id="addClientBtn">＋ Add client</button></div>
           <div class="toolbar"><div class="search-box"><span>⌕</span><input id="clientSearch" placeholder="Search clients..." /></div><span class="result-count" id="clientCount">0 clients</span></div>
           <div class="entity-grid" id="clientGrid"></div>
+          <section class="panel published-links-panel" id="publishedLinksPanel" hidden>
+            <div class="panel-heading published-links-heading"><div><div class="eyebrow">CLIENT PUBLISHING RECORDS</div><h2 id="publishedLinksClientName">Published Links</h2><p>Track live article URLs, prices and payment status for this client.</p></div><div class="published-links-heading-actions"><button class="secondary-btn" id="closePublishedLinksBtn" type="button">Close</button><button class="primary-btn" id="addPublishedLinkBtn" type="button">＋ Add published link</button></div></div>
+            <div class="published-link-summary" id="publishedLinkSummary"></div>
+            <div class="toolbar published-links-toolbar"><div class="search-box"><span>⌕</span><input id="publishedLinkSearch" placeholder="Search URL or website..." /></div><select id="publishedLinkStatusFilter" class="filter-select"><option value="all">All statuses</option><option value="paid">Paid</option><option value="unpaid">Unpaid</option></select><select id="publishedLinkCurrencyFilter" class="filter-select"><option value="all">All currencies</option><option value="USD">USD</option><option value="PKR">PKR</option></select><label class="month-filter-label">Month <input id="publishedLinkMonth" type="month" /></label></div>
+            <div class="table-panel"><div class="table-wrap"><table><thead><tr><th>PUBLISHED URL</th><th>DATE</th><th>PRICE</th><th>STATUS</th><th>NOTES</th><th></th></tr></thead><tbody id="publishedLinkRows"></tbody></table></div></div>
+          </section>
         </section>
 
         <section class="page-view" id="page-invoices">

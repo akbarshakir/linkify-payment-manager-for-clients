@@ -33,3 +33,15 @@ Before using this version, run `supabase-account-ledger-migration.sql` once in t
 - Transactions can be filtered by month, contact, and received/sent type.
 
 Important: When you set an overall account total, enter the full amount owed for that currency, including any work that also has invoices. The linked invoice records remain available as supporting details, but their balances are not added a second time to the overall account total.
+
+
+## Client Published Links
+
+Run `supabase-published-links-migration.sql` once in Supabase SQL Editor before deploying this version. The migration creates a separate `client_published_links` table with owner-only RLS policies.
+
+- Published Links is available only from Client cards. Vendor screens and vendor records are unchanged.
+- Save the live article URL, amount, currency (USD or PKR), publication date, payment status (Paid or Unpaid), and optional notes.
+- Each client has separate USD and PKR totals for total published value, paid value, and unpaid value.
+- Search, status, currency, and month filters are available.
+- Links can be edited or deleted. Deleting a link does not create or modify a payment transaction.
+- Marking a link Paid changes only its published-link status. It does not create a payment or change the overall client account balance. Record actual money received separately in Transactions.
